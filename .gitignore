@@ -27,6 +27,8 @@ wp-content/upgrade/
 wp-content/backup*/
 wp-content/wflogs/
 wp-content/debug.log
+wp-content/plugins/
+wp-content/languages/
 *.sql
 *.sql.gz
 

@@ -1,0 +1,20 @@
+/*
+Theme Name: Pedro Ribeiro
+Theme URI: https://github.com/pedro-ribeiro/portfolio-pedro-ribeiro
+Author: Pedro Ribeiro
+Author URI: https://github.com/pedro-ribeiro
+Description: Portfólio one-page — tema Underscores adaptado (Vite + Tailwind).
+Version: 1.0.0
+Requires at least: 6.4
+Tested up to: 6.8
+Requires PHP: 8.2
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: pedro-ribeiro
+Tags: portfolio, custom-menu, translation-ready
+
+Pedro Ribeiro Portfolio is based on Underscores https://underscores.me/, (C) 2012-2024 Automattic, Inc.
+Underscores is distributed under the terms of the GNU GPL v2 or later.
+*/
+
+/* Front-end styles are built by Vite into dist/ and enqueued from functions.php. */

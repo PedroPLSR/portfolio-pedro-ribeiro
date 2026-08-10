@@ -117,20 +117,20 @@ description: "Task list for Portfólio One-Page Pedro Ribeiro"
 
 ### C0 — Docker & theme scaffold
 
-- [ ] T021 Create `docker/docker-compose.yml` with WordPress + MySQL + phpMyAdmin (phpMyAdmin local-only profile/service); mount `wp-content/` ; do not vendor WP core in Git
-- [ ] T022 [P] Add `docker/.env.example` (DB creds, ports, `LASTFM_API_KEY` placeholder) and ensure `docker/.env` is gitignored
-- [ ] T023 [P] Document local `docker compose` up/down and “no phpMyAdmin in production” in `docker/README.md`
-- [ ] T024 Scaffold Underscores-based theme into `wp-content/themes/pedro-ribeiro/` (`style.css`, `functions.php`, `header.php`, `footer.php`)
-- [ ] T025 Add theme Vite pipeline (`wp-content/themes/pedro-ribeiro/package.json`, `vite.config.js`, `src/styles/`, `src/js/`) porting tokens/assets from `frontend/`
-- [ ] T026 Enqueue built theme CSS/JS from `wp-content/themes/pedro-ribeiro/functions.php`
+- [X] T021 Create `docker/docker-compose.yml` with WordPress + MySQL + phpMyAdmin (phpMyAdmin local-only profile/service); mount `wp-content/` ; do not vendor WP core in Git
+- [X] T022 [P] Add `docker/.env.example` (DB creds, ports, `LASTFM_API_KEY` placeholder) and ensure `docker/.env` is gitignored
+- [X] T023 [P] Document local `docker compose` up/down and “no phpMyAdmin in production” in `docker/README.md`
+- [X] T024 Scaffold Underscores-based theme into `wp-content/themes/pedro-ribeiro/` (`style.css`, `functions.php`, `header.php`, `footer.php`)
+- [X] T025 Add theme Vite pipeline (`wp-content/themes/pedro-ribeiro/package.json`, `vite.config.js`, `src/styles/`, `src/js/`) porting tokens/assets from `frontend/`
+- [X] T026 Enqueue built theme CSS/JS from `wp-content/themes/pedro-ribeiro/functions.php`
 
 ### C1 — Port one-pager markup
 
-- [ ] T027 Create `wp-content/themes/pedro-ribeiro/front-page.php` composing section partials in constitution order
-- [ ] T028 [P] [US1] Port Hero + nav + Sobre markup into `wp-content/themes/pedro-ribeiro/template-parts/hero.php`, `header.php` (nav), `template-parts/sobre.php` with `esc_*`
-- [ ] T029 [P] [US2] Port Projetos + Experiência into `wp-content/themes/pedro-ribeiro/template-parts/projetos.php` and `template-parts/experiencia.php` with `esc_*`
-- [ ] T030 [P] [US3] Port Contato into `wp-content/themes/pedro-ribeiro/template-parts/contato.php` with `esc_*` (no form)
-- [ ] T031 [US4] Add stub `wp-content/themes/pedro-ribeiro/template-parts/now.php` that renders nothing until live wiring (or only if safe hardcoded empty guard)
+- [X] T027 Create `wp-content/themes/pedro-ribeiro/front-page.php` composing section partials in constitution order
+- [X] T028 [P] [US1] Port Hero + nav + Sobre markup into `wp-content/themes/pedro-ribeiro/template-parts/hero.php`, `header.php` (nav), `template-parts/sobre.php` with `esc_*`
+- [X] T029 [P] [US2] Port Projetos + Experiência into `wp-content/themes/pedro-ribeiro/template-parts/projetos.php` and `template-parts/experiencia.php` with `esc_*`
+- [X] T030 [P] [US3] Port Contato into `wp-content/themes/pedro-ribeiro/template-parts/contato.php` with `esc_*` (no form)
+- [X] T031 [US4] Add stub `wp-content/themes/pedro-ribeiro/template-parts/now.php` that renders nothing until live wiring (or only if safe hardcoded empty guard)
 
 ### C2 — User Story 5: Escritos ready (P2)
 
@@ -138,10 +138,10 @@ description: "Task list for Portfólio One-Page Pedro Ribeiro"
 
 **Independent Test**: quickstart P2-06, P2-07 (after WP up).
 
-- [ ] T032 [US5] Implement conditional Escritos home partial (up to 3 posts; omit entire section if zero) in `wp-content/themes/pedro-ribeiro/template-parts/escritos.php` and include from `front-page.php`
-- [ ] T033 [P] [US5] Create minimal editorial `wp-content/themes/pedro-ribeiro/single.php`
-- [ ] T034 [P] [US5] Create minimal editorial `wp-content/themes/pedro-ribeiro/archive.php`
-- [ ] T035 Ensure `wp-content/themes/pedro-ribeiro/acf-json/` exists (empty placeholder; ready for owner sync) and load path registered in `wp-content/themes/pedro-ribeiro/inc/acf.php`
+- [X] T032 [US5] Implement conditional Escritos home partial (up to 3 posts; omit entire section if zero) in `wp-content/themes/pedro-ribeiro/template-parts/escritos.php` and include from `front-page.php`
+- [X] T033 [P] [US5] Create minimal editorial `wp-content/themes/pedro-ribeiro/single.php`
+- [X] T034 [P] [US5] Create minimal editorial `wp-content/themes/pedro-ribeiro/archive.php`
+- [X] T035 Ensure `wp-content/themes/pedro-ribeiro/acf-json/` exists (empty placeholder; ready for owner sync) and load path registered in `wp-content/themes/pedro-ribeiro/inc/acf.php`
 
 **Checkpoint**: Theme mirrors accepted front; Escritos templates exist. Content still hardcoded or empty until Phase D.
 
