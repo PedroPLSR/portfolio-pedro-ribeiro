@@ -1,0 +1,50 @@
+# Dependencies & builds
+node_modules/
+frontend/dist/
+frontend/node_modules/
+**/node_modules/
+**/dist/
+
+# Secrets & local env
+.env
+.env.*
+!.env.example
+docker/.env
+
+# WordPress — core stays in Docker volumes, not Git
+wordpress/
+wp-admin/
+wp-includes/
+wp-*.php
+xmlrpc.php
+license.txt
+readme.html
+
+# WP runtime noise (theme source is tracked under wp-content/themes/)
+wp-content/uploads/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/backup*/
+wp-content/wflogs/
+wp-content/debug.log
+*.sql
+*.sql.gz
+
+# Logs & caches
+*.log
+npm-debug.log*
+.pnpm-store/
+.cache/
+coverage/
+
+# OS junk
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.swp
+*~
+
+# Editors (keep project rules/skills if needed via force-add)
+.idea/
+*.iml
