@@ -53,6 +53,7 @@ Desktop.ini
 
 # Editors (keep project rules/skills if needed via force-add)
 .idea/
+.vscode/
 *.iml
 
 # Example files (used for development)

@@ -22,12 +22,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="page-shell site-nav__inner">
 			<a class="site-nav__brand" href="<?php echo esc_url( home_url( '/#topo' ) ); ?>"><?php echo esc_html( 'PR' ); ?></a>
 			<nav aria-label="<?php echo esc_attr__( 'Seções', 'pedro-ribeiro' ); ?>">
-				<ul class="site-nav__list">
-					<li><a href="<?php echo esc_url( home_url( '/#sobre' ) ); ?>"><?php echo esc_html__( 'Sobre', 'pedro-ribeiro' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/#projetos' ) ); ?>"><?php echo esc_html__( 'Projetos', 'pedro-ribeiro' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/#experiencia' ) ); ?>"><?php echo esc_html__( 'Experiência', 'pedro-ribeiro' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/#contato' ) ); ?>"><?php echo esc_html__( 'Contato', 'pedro-ribeiro' ); ?></a></li>
-				</ul>
+				<?php
+				if ( function_exists( 'pedro_ribeiro_nav_location_has_items' ) && pedro_ribeiro_nav_location_has_items( 'primary' ) ) {
+					wp_nav_menu(
+						array(
+							'theme_location' => 'primary',
+							'depth'          => 1,
+							'container'      => false,
+							'menu_class'     => 'site-nav__list',
+							'fallback_cb'    => 'pedro_ribeiro_primary_nav_fallback',
+						)
+					);
+				} elseif ( function_exists( 'pedro_ribeiro_primary_nav_fallback' ) ) {
+					pedro_ribeiro_primary_nav_fallback();
+				}
+				?>
 			</nav>
 		</div>
 	</header>
