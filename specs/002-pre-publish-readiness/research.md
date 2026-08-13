@@ -31,26 +31,36 @@ Locked by spec clarifications (Session 2026-08-13) and the `/speckit-plan` promp
 - Nested walker — out of spec (flat only).
 - Fallback as Custom Menu widget — extra chrome.
 
-## R3 — Phase B: CSS-only dark via `prefers-color-scheme`
+## R3 — Phase B: system first, then explicit Claro ↔ Escuro
 
-**Decision**: Remap the existing `@theme` token family in `src/styles/main.css` inside `@media (prefers-color-scheme: dark)` on `html` / `:root`:
+**Decision**: Remap the existing `@theme` token family in `src/styles/main.css` on `html[data-theme="dark"]` (and `:root` as needed):
 
 `canvas`, `canvas-deep`, `ink`, `ink-muted`, `accent`, `accent-soft`, `line`.
+
+Resolve order (must match first paint):
+
+1. If `localStorage` has `light` or `dark` → use that (explicit override).
+2. Else follow `prefers-color-scheme` (`dark` → dark; `light` or `no-preference` → light).
 
 Also:
 
 - `html { color-scheme: light; }` stays the authored default.
-- In the dark media query: `color-scheme: dark;` plus token overrides.
-- **No** JS class, cookie, toggle, or admin force-dark.
-- Vite rebuild (`npm run build` in the theme) so `dist/` CSS in `wp_head` applies on first paint → no light→dark FOUC.
+- When resolved dark: `color-scheme: dark` plus token overrides on `html[data-theme="dark"]`.
+- **Minimal inline script in `<head>` before `wp_head()`** sets `document.documentElement.dataset.theme` (values `light` | `dark`) so the first CSS paint already matches — no light→dark FOUC. Vite `dist/` CSS still in `wp_head`.
+- Compact header control **Claro ↔ Escuro** (exactly two options). Not a nav menu item. MUST NOT overpower brand. Writes `localStorage` (key `pedro-ribeiro-appearance`, values `light` | `dark`) and updates `data-theme` immediately.
+- Listen to `prefers-color-scheme` changes **only when nothing is saved**. After any toggle, the saved value wins until the visitor toggles again or clears site data. No UI path back to “System”.
+- **No** cookie, query param, or admin force-dark.
+- `@media (prefers-color-scheme: dark)` MAY remap tokens when `data-theme` is unset (JS disabled / first paint before script in broken clients). Once `data-theme` is set, the attribute wins over the media query.
 - Replace leftover non-token paints that would stay “light” in dark mode: `.btn--primary` `#f7fbfc`, `::selection` mix with `white`, `.site-atmosphere` mix with `#9bb8b0`, other `color-mix(..., white, ...)`. Introduce a token such as `--color-on-accent` if needed for button text.
 
-**Rationale**: Spec US2; constitution “dark MUST NOT be the default”; CSS-only follows system live (FR-011) without a control (FR-009).
+**Rationale**: Spec US2 (2026-08-13 appearance-control clarification); constitution “dark MUST NOT be the default”; FR-007–011. Two-state control is smaller than a three-way System/Light/Dark picker.
 
 **Alternatives considered**:
-- `html.dark` + toggle — forbidden in v1.
+- CSS-only `@media (prefers-color-scheme: dark)` with **no** toggle — previous v1; superseded by the owner (need an override).
+- Three-way System / Light / Dark — rejected (product: Claro ↔ Escuro only).
+- Cookie or server-side preference — rejected (no cookie; appearance is visitor-local).
 - Duplicate dark stylesheet — extra request, FOUC risk.
-- Tailwind `dark:` variant with class strategy — needs JS; media strategy is enough if tokens are remapped.
+- Tailwind `dark:` class strategy alone without a head script — FOUC.
 
 ## R4 — Dark palette + WCAG 2.2 AA
 

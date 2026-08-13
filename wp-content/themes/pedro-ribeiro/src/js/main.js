@@ -1,5 +1,60 @@
 import '../styles/main.css';
 
+const APPEARANCE_KEY = 'pedro-ribeiro-appearance';
+
+const readSavedAppearance = () => {
+  try {
+    const saved = localStorage.getItem(APPEARANCE_KEY);
+    return saved === 'light' || saved === 'dark' ? saved : '';
+  } catch {
+    return '';
+  }
+};
+
+const applyAppearance = (theme, persist) => {
+  const root = document.documentElement;
+  root.setAttribute('data-theme', theme);
+  root.style.colorScheme = theme;
+  if (persist) {
+    try {
+      localStorage.setItem(APPEARANCE_KEY, theme);
+    } catch {
+      /* private mode */
+    }
+  }
+  document.querySelectorAll('[data-theme-set]').forEach((button) => {
+    button.setAttribute('aria-pressed', button.getAttribute('data-theme-set') === theme ? 'true' : 'false');
+  });
+};
+
+const resolvedAppearance = () => {
+  const saved = readSavedAppearance();
+  if (saved) return saved;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
+applyAppearance(resolvedAppearance(), false);
+
+document.querySelectorAll('[data-theme-set]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const theme = button.getAttribute('data-theme-set');
+    if (theme === 'light' || theme === 'dark') {
+      applyAppearance(theme, true);
+    }
+  });
+});
+
+const schemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+const onSchemeChange = (event) => {
+  if (readSavedAppearance()) return;
+  applyAppearance(event.matches ? 'dark' : 'light', false);
+};
+if (typeof schemeQuery.addEventListener === 'function') {
+  schemeQuery.addEventListener('change', onSchemeChange);
+} else if (typeof schemeQuery.addListener === 'function') {
+  schemeQuery.addListener(onSchemeChange);
+}
+
 const nav = document.querySelector('[data-site-nav]');
 
 const onScroll = () => {

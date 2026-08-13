@@ -3,7 +3,7 @@
 **Feature**: `002-pre-publish-readiness`  
 **Audience**: Implementers (theme `header.php` / `footer.php` / setup)  
 **Date**: 2026-08-13  
-**Phases**: A (menus), C (switcher). B must not change this chrome structure.
+**Phases**: A (menus), B (appearance control), C (switcher). B adds the compact appearance control; it MUST NOT restyle the nav into a second brand or replace section links.
 
 Extends [001 ui-home](../../001-portfolio-one-pager/contracts/ui-home.md). Section order and IDs from 001 remain required.
 
@@ -27,7 +27,8 @@ Extends [001 ui-home](../../001-portfolio-one-pager/contracts/ui-home.md). Secti
 | Nav landmark | `aria-label` via gettext (current: “Seções”). |
 | Assigned primary | `wp_nav_menu` items replace the hardcoded `<li>` list; keep `.site-nav__list` and compact persistent styles. MUST NOT overpower brand in the first viewport. |
 | Fallback primary | Sobre → `#sobre`; Projetos → `#projetos`; Experiência → `#experiencia`; Contato → `#contato`. Labels gettext; **hashes never translated**. URLs via `home_url('/#…')` so inner pages reach home. |
-| Language control | Phase C only. Compact PT \| EN after section nav. MUST NOT replace section links. See [i18n.md](./i18n.md). |
+| Appearance control | Phase B. Compact **Claro ↔ Escuro** in the header (after section nav; before the language control once C exists). Exactly two options. MUST NOT overpower brand, MUST NOT replace section links, MUST NOT be a menu item. See [appearance.md](./appearance.md). |
+| Language control | Phase C only. Compact PT \| EN after section nav (and after the appearance control). MUST NOT replace section links. See [i18n.md](./i18n.md). |
 
 Treat “assigned but zero items” the same as unassigned (use fallback).
 
@@ -61,5 +62,5 @@ A menu or fallback item pointing at a home section MUST use the language home UR
 
 - Nested menus in v1
 - Career-level labels in menu text
-- Appearance toggle disguised as a menu item
+- Appearance control as a WordPress menu item, a three-way System/Light/Dark picker, a cookie, or an admin “force dark”
 - Language control that hides or replaces Projetos/Contato nav

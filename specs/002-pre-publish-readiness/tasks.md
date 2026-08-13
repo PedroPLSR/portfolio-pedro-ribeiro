@@ -29,7 +29,7 @@ description: "Task list for Pré-publish — menus, dark mode e i18n"
 |-------|-------|------|--------|------|
 | 1–2 Setup + Foundational | — | Start of Chat 1 | `feat/menus` | T003 |
 | 3 Menus | US1 P1 | **Chat 1** | `feat/menus` | T012 (A-01…A-07) |
-| 4 Dark | US2 P2 | **Chat 2** | `feat/dark-mode` (after A merged, or on top of A) | T020 (B-01…B-08) |
+| 4 Dark | US2 P2 | **Chat 2** | `feat/dark-mode` (after A merged, or on top of A) | T020 (B-01…B-11) |
 | 5 i18n | US3 P3 | **Chat 3** | `feat/i18n` (after A; B may already be merged) | T034 (C-01…C-12) |
 | 6 Polish | — | End of Chat 3 | `feat/i18n` | T037 |
 
@@ -84,26 +84,26 @@ description: "Task list for Pré-publish — menus, dark mode e i18n"
 
 ---
 
-## Phase 4: User Story 2 — Appearance follows the visitor’s system (Priority: P2)
+## Phase 4: User Story 2 — Appearance follows the system until the visitor chooses (Priority: P2)
 
-**Goal**: Dark via `prefers-color-scheme` token remap; light stays authored default; WCAG 2.2 AA; no toggle; no FOUC.
+**Goal**: First visit follows `prefers-color-scheme`; compact header Claro ↔ Escuro; `localStorage` override; anti-FOUC `data-theme`; light stays authored default; WCAG 2.2 AA.
 
-**Independent Test**: `specs/002-pre-publish-readiness/quickstart.md` B-01…B-08.
+**Independent Test**: `specs/002-pre-publish-readiness/quickstart.md` B-01…B-11.
 
-**Contract**: `specs/002-pre-publish-readiness/contracts/appearance.md`
+**Contract**: `specs/002-pre-publish-readiness/contracts/appearance.md` (+ appearance control in `contracts/ui-chrome.md`)
 
 **Depends on**: Phase 3 merged **or** this branch stacked on `feat/menus`. **No Polylang in this chat.**
 
 ### Implementation for User Story 2
 
-- [ ] T013 [US2] Create git branch `feat/dark-mode` from merged A (or from `feat/menus`); touch appearance only under `wp-content/themes/pedro-ribeiro/src/styles/main.css` (+ Vite `dist/`)
-- [ ] T014 [US2] Set `html { color-scheme: light; }` as authored default and `color-scheme: dark` inside `@media (prefers-color-scheme: dark)` in `wp-content/themes/pedro-ribeiro/src/styles/main.css`
-- [ ] T015 [US2] Remap `@theme` tokens `canvas`, `canvas-deep`, `ink`, `ink-muted`, `accent`, `accent-soft`, `line` (and `--color-on-accent` if added) in that dark media query in `wp-content/themes/pedro-ribeiro/src/styles/main.css` per `specs/002-pre-publish-readiness/contracts/appearance.md` (lighten accent in dark; keep petrol hue)
-- [ ] T016 [US2] Replace light-only leftovers in `wp-content/themes/pedro-ribeiro/src/styles/main.css` (`.btn--primary` `#f7fbfc`, `::selection` mix with `white`, `.site-atmosphere` `#9bb8b0`, other page-paint `color-mix(..., white, ...)`) with tokens
-- [ ] T017 [US2] Run `npm run build` in `wp-content/themes/pedro-ribeiro/` so dark CSS ships in `dist/` / `wp_head` (no JS class, no cookie, no FOUC)
-- [ ] T018 [US2] Confirm there is no appearance toggle in `wp-content/themes/pedro-ribeiro/header.php`, `footer.php`, and `src/js/main.js`
-- [ ] T019 [US2] Contrast-check text + essential controls to WCAG 2.2 AA in **light and dark** against tokens in `wp-content/themes/pedro-ribeiro/src/styles/main.css`; adjust dark pairs if they fail; reject purple/neon “AI dark”
-- [ ] T020 [US2] **GATE — Chat 2**: run quickstart B-01…B-08 in `specs/002-pre-publish-readiness/quickstart.md` (light unchanged; dark readable; live OS change; first paint dark; no toggle; A-07 regression still holds)
+- [X] T013 [US2] Create git branch `feat/dark-mode` from merged A (or from `feat/menus`). Branch already exists. T014–T020 may touch `wp-content/themes/pedro-ribeiro/header.php` (toggle + anti-FOUC head script), `src/styles/main.css`, `src/js/main.js` as needed, and Vite `dist/`. No Polylang.
+- [X] T014 [US2] Keep `html { color-scheme: light; }` as authored default in `wp-content/themes/pedro-ribeiro/src/styles/main.css`; apply `color-scheme: dark` and dark tokens on `html[data-theme="dark"]`; keep `@media (prefers-color-scheme: dark)` only as fallback when `data-theme` is unset
+- [X] T015 [US2] Remap `@theme` tokens `canvas`, `canvas-deep`, `ink`, `ink-muted`, `accent`, `accent-soft`, `line` (and `--color-on-accent` if added) for dark per `specs/002-pre-publish-readiness/contracts/appearance.md` (lighten accent in dark; keep petrol hue) in `wp-content/themes/pedro-ribeiro/src/styles/main.css`
+- [X] T016 [US2] Replace light-only leftovers in `wp-content/themes/pedro-ribeiro/src/styles/main.css` (`.btn--primary` `#f7fbfc`, `::selection` mix with `white`, `.site-atmosphere` `#9bb8b0`, other page-paint `color-mix(..., white, ...)`) with tokens; style the appearance control with tokens
+- [X] T017 [US2] Add a minimal inline anti-FOUC script in `wp-content/themes/pedro-ribeiro/header.php` `<head>` **before** `wp_head()`: if `localStorage` `pedro-ribeiro-appearance` is `light`|`dark`, use it; else follow `prefers-color-scheme` (`no-preference` → light); set `html` `data-theme`. Run `npm run build` in `wp-content/themes/pedro-ribeiro/` so token CSS ships in `dist/` / `wp_head`. No cookie.
+- [X] T018 [US2] Add compact **Claro ↔ Escuro** control in `wp-content/themes/pedro-ribeiro/header.php` (after section nav, not a menu item, MUST NOT overpower brand); wire it in `src/js/main.js` (or equivalent) to write `localStorage` and update `data-theme`; listen to OS changes only when nothing is saved; confirm footer has no second appearance control and there is no three-way System option
+- [X] T019 [US2] Contrast-check text + essential controls (including the appearance control) to WCAG 2.2 AA in **light and dark** against tokens in `wp-content/themes/pedro-ribeiro/src/styles/main.css`; adjust dark pairs if they fail; reject purple/neon “AI dark”
+- [X] T020 [US2] **GATE — Chat 2**: run quickstart B-01…B-11 in `specs/002-pre-publish-readiness/quickstart.md` (system light/dark with nothing saved; toggle persist; OS live only when unsaved; first paint dark; no cookie/admin force; A-07 regression still holds)
 
 **Checkpoint**: US2 done. Merge/PR `feat/dark-mode`. **Stop Chat 2.** Next chat is Phase 5 on `feat/i18n`.
 
@@ -174,7 +174,7 @@ description: "Task list for Pré-publish — menus, dark mode e i18n"
 ### Parallel Opportunities
 
 - T009 (footer CSS) can overlap T007/T008 once T006 exists (different files).
-- T018 can overlap T017 (header/js vs build) after T016.
+- T018 (header toggle + JS) can overlap T017 (head script vs Vite build) after T016.
 - T029 and T030 can run in parallel after T026.
 - T036 and T037 in parallel after T035 starts.
 - **Do not** parallelize Chat 1+2+3 in one working tree (user asked separate implement chats/branches).
@@ -211,7 +211,7 @@ Task: "Confirm stable section IDs in wp-content/themes/pedro-ribeiro/template-pa
 ### Incremental Delivery
 
 1. Chat 1 `feat/menus` → A-01…A-07
-2. Chat 2 `feat/dark-mode` → B-01…B-08
+2. Chat 2 `feat/dark-mode` → B-01…B-11
 3. Chat 3 `feat/i18n` → C-01…C-12 then T035–T037
 
 ### Chat rules
@@ -221,7 +221,7 @@ Task: "Confirm stable section IDs in wp-content/themes/pedro-ribeiro/template-pa
 - Chat 3: Polylang **free only**; no Multisite/WPML/TranslatePress Pro
 - Never invent ACF keys
 - Never rename section IDs
-- Never add a dark toggle
+- Appearance control is **Claro ↔ Escuro** only (not three-way); no cookie; no admin force-dark
 
 ---
 
@@ -229,6 +229,7 @@ Task: "Confirm stable section IDs in wp-content/themes/pedro-ribeiro/template-pa
 
 - [P] = different files, no incomplete deps
 - Manual smoke lives in T012 / T020 / T034 (not a TDD suite)
+- T014–T020 reopened after the Claro ↔ Escuro product delta; T013 (`feat/dark-mode`) stays done
 - Fallback hashes stay `#sobre` `#projetos` `#experiencia` `#contato` in every language
 - `pedro_ribeiro_home_id()` language mapping is US3-only; Phases A/B keep current `page_on_front` behavior
 - Suggested branches: `feat/menus` → `feat/dark-mode` → `feat/i18n`

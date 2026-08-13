@@ -6,7 +6,7 @@
 
 ## Summary
 
-Stack three pre-publish capabilities onto the existing `pedro-ribeiro` WordPress theme (feature 001 already delivered): **(A)** native header/footer menus with hardcoded fallback, **(B)** system dark appearance by remapping CSS tokens under `prefers-color-scheme` (light stays authored default; WCAG 2.2 AA; no toggle), **(C)** Polylang free — PT at `/`, EN at `/en/`, ACF flex on a sister home, no browser auto-redirect, hide EN until the English home is published. Implement in **separate chats** A → B → C. Do not break one-pager order, Now, Escritos, omit-empty ACF, or the career-label ban.
+Stack three pre-publish capabilities onto the existing `pedro-ribeiro` WordPress theme (feature 001 already delivered): **(A)** native header/footer menus with hardcoded fallback, **(B)** dark appearance via token remap — first visit follows `prefers-color-scheme`, compact Claro ↔ Escuro header control, `localStorage` override, anti-FOUC, light authored default, WCAG 2.2 AA, **(C)** Polylang free — PT at `/`, EN at `/en/`, ACF flex on a sister home, no browser auto-redirect, hide EN until the English home is published. Implement in **separate chats** A → B → C. Do not break one-pager order, Now, Escritos, omit-empty ACF, or the career-label ban.
 
 ### Clarify delta (2026-08-13)
 
@@ -17,6 +17,7 @@ Stack three pre-publish capabilities onto the existing `pedro-ribeiro` WordPress
 | Section IDs | Same in PT and EN (`#projetos` stays `#projetos`) |
 | Language switch | Preserve home hash (`/#projetos` ↔ `/en/#projetos`) |
 | Contrast | WCAG 2.2 AA for text + essential controls in light and dark |
+| Appearance control | Claro ↔ Escuro only (not three-way). No saved pref → system. Saved pref → `localStorage` override. Anti-FOUC head script. No cookie / no admin force-dark. |
 
 ## Technical Context
 
@@ -32,9 +33,9 @@ Stack three pre-publish capabilities onto the existing `pedro-ribeiro` WordPress
 
 **Project Type**: Classic WordPress theme (incremental pre-publish)
 
-**Performance Goals**: Menu/dark/i18n MUST NOT add blocking third-party requests on first paint. Dark via CSS in `wp_head` (no FOUC). Now timeouts/transients unchanged.
+**Performance Goals**: Menu/dark/i18n MUST NOT add blocking third-party requests on first paint. Dark tokens in `wp_head` CSS plus a **minimal inline `<head>` script** (anti-FOUC) that sets `html` `data-theme` before paint. Now timeouts/transients unchanged.
 
-**Constraints**: No Multisite; no WPML/TranslatePress Pro; no paid extras; no dark default; no appearance toggle/cookie; no Accept-Language redirect; no career-level labels; secrets stay out of Git; do not invent ACF keys; WP core not in repo
+**Constraints**: No Multisite; no WPML/TranslatePress Pro; no paid extras; no dark as site default; no appearance cookie / no admin force-dark; no three-way System/Light/Dark control; no Accept-Language redirect; no career-level labels; secrets stay out of Git; do not invent ACF keys; WP core not in repo
 
 **Scale/Scope**: One one-pager + existing single/archive; two menu locations; two locales (pt_BR, en_US); token remap only (not a second design system)
 
@@ -46,15 +47,15 @@ Stack three pre-publish capabilities onto the existing `pedro-ribeiro` WordPress
 |------|--------|-------|
 | I. Conteúdo no CMS | Pass | Menus in Appearance → Menus; home copy still ACF; fallback is chrome only |
 | II. Tema como produto | Pass | Changes stay in `_s` theme; `esc_*` on menu URLs/labels; partials kept |
-| III. Front honesto | Pass | Real CSS tokens + small hash JS; Vite rebuild; no page builder |
-| IV. Design editorial técnico | Pass | Light remains authored default; dark only when system requests it; petrol accent; no AI-default looks |
+| III. Front honesto | Pass | Real CSS tokens + small head anti-FOUC script + toggle JS; Vite rebuild; no page builder |
+| IV. Design editorial técnico | Pass | Light remains authored default; dark when system requests it **or** visitor saved dark; petrol accent; no AI-default looks |
 | V. One-pager focado | Pass | Section order and IDs unchanged; Escritos still conditional; no contact form |
 | VI. Integrações resilientes | Pass | Now fetchers/transients untouched; chrome labels gettext-only |
 | VII. Dev reproduzível | Pass | Existing Docker; Polylang installed in that WP, not a new compose stack |
 | VIII. Simplicidade / YAGNI | Pass | Polylang free is the justified bilingual slice; no Multisite/paid suite; A/B work without C |
 | Development Order | Pass | Front-first already satisfied by 001; this feature is theme-only follow-on |
 
-**Post-design re-check**: research/data-model/contracts/quickstart keep dark non-default, ACF keys owner-owned, Now/Escritos behavior intact, and Phase C optional relative to A/B — gates still Pass. No constitution amendment required.
+**Post-design re-check**: research/data-model/contracts/quickstart keep dark non-default, two-state visitor override in `localStorage` (no cookie), ACF keys owner-owned, Now/Escritos behavior intact, and Phase C optional relative to A/B — gates still Pass. No constitution amendment required.
 
 ## Project Structure
 
@@ -78,7 +79,7 @@ specs/002-pre-publish-readiness/
 ```text
 wp-content/themes/pedro-ribeiro/
 ├── functions.php                 # register_nav_menus; optional i18n helpers
-├── header.php                    # wp_nav_menu primary + fallback; language switcher (C)
+├── header.php                    # wp_nav_menu primary + fallback; appearance toggle (B); language switcher (C)
 ├── footer.php                    # optional footer menu + copyright
 ├── inc/
 │   ├── acf.php                   # home_id() language-aware in C
@@ -86,8 +87,8 @@ wp-content/themes/pedro-ribeiro/
 │   └── i18n.php                  # Phase C: 404 guard, switcher helper (optional split)
 ├── template-parts/               # stable section IDs; gettext chrome
 ├── languages/                    # Phase C: pedro-ribeiro-en_US.po/.mo
-├── src/styles/main.css           # Phase B: dark token media query + detokenize leftovers
-├── src/js/main.js                # Phase C: preserve hash on language switch
+├── src/styles/main.css           # Phase B: dark tokens on data-theme (+ media fallback) + detokenize leftovers
+├── src/js/main.js                # Phase B: toggle persistence; Phase C: preserve hash on language switch
 ├── dist/                         # Vite build output (rebuild after B/C CSS/JS)
 └── acf-json/                     # no new keys; EN is sister page content
 
@@ -114,11 +115,11 @@ Task generation (`/speckit-tasks`) and implement chats **must** follow this spli
 
 ### Phase B — Dark (US2) — implement chat 2
 
-1. Remap tokens in `prefers-color-scheme: dark`; set `color-scheme` accordingly.
-2. Tokenize leftover light-only paints (button text, atmosphere mix, selection).
-3. Vite rebuild. Verify no toggle/cookie and no FOUC (CSS in head).
-4. Contrast-check light + dark to WCAG 2.2 AA; adjust dark accent lighter if needed.
-5. Visual ban: no purple/neon “AI dark”. Light look unchanged when system is light.
+1. Tokenize leftover light-only paints; remap tokens for dark (petrol, lighter accent). Key CSS off `html[data-theme="dark"]` (authored `html { color-scheme: light }`). Keep `@media (prefers-color-scheme: dark)` as fallback when `data-theme` is unset (no JS).
+2. Inline minimal anti-FOUC script in `header.php` `<head>` **before** `wp_head()`: if `localStorage` has `light`|`dark`, use it; else follow `prefers-color-scheme` (`no-preference` → light); set `data-theme` and `color-scheme`.
+3. Compact Claro ↔ Escuro control in the header (not a menu item; does not overpower brand). Toggle writes `localStorage` and sets `data-theme` immediately. Listen to system changes only when nothing is saved. No cookie; no admin force-dark; no third “System” option.
+4. Vite rebuild. Contrast-check light + dark to WCAG 2.2 AA; adjust dark accent lighter if needed.
+5. Visual ban: no purple/neon “AI dark”. Light look unchanged when system is light and nothing is saved.
 
 ### Phase C — i18n (US3) — implement chat 3
 
@@ -132,9 +133,9 @@ Task generation (`/speckit-tasks`) and implement chats **must** follow this spli
 
 | Artifact | Role |
 |----------|------|
-| [research.md](./research.md) | Menus fallback, CSS dark/AA, Polylang, hash JS, gettext |
-| [data-model.md](./data-model.md) | Locations, palettes, locales, EN home states |
-| [contracts/ui-chrome.md](./contracts/ui-chrome.md) | Header/footer/switcher/IDs |
-| [contracts/appearance.md](./contracts/appearance.md) | Tokens, AA, FOUC, no toggle |
+| [research.md](./research.md) | Menus fallback, appearance resolve + AA, Polylang, hash JS, gettext |
+| [data-model.md](./data-model.md) | Locations, palettes, visitor appearance preference, locales, EN home states |
+| [contracts/ui-chrome.md](./contracts/ui-chrome.md) | Header/footer/appearance control/switcher/IDs |
+| [contracts/appearance.md](./contracts/appearance.md) | Tokens, resolve order, toggle, AA, FOUC |
 | [contracts/i18n.md](./contracts/i18n.md) | Polylang settings, URLs, 404, ACF sister page |
 | [quickstart.md](./quickstart.md) | Validation scenarios A → B → C |

@@ -41,7 +41,7 @@ Used when a location is unassigned or has zero items.
 
 ### Appearance palette
 
-Two mappings of the same token names. Light is authored default; dark applies iff the system prefers dark.
+Two mappings of the same token names. Light is authored default. Dark applies when the system prefers dark **and** nothing is saved, **or** when the visitor has saved `dark`.
 
 | Token | Role | Light | Dark (starting; verify AA) |
 |-------|------|-------|------------------------------|
@@ -54,7 +54,19 @@ Two mappings of the same token names. Light is authored default; dark applies if
 | line | Hairlines | mix ink 12% | mix ink ~16% |
 | on-accent | Text on accent buttons | `#f7fbfc` | `#0e1518` |
 
-**Rules**: WCAG 2.2 AA for text and essential controls in both mappings. No visitor-stored preference. `color-scheme` reflects the active mapping.
+**Rules**: WCAG 2.2 AA for text and essential controls in both mappings. `color-scheme` and `html` `data-theme` reflect the **resolved** mapping. Visitor override is `localStorage` only.
+
+### Visitor appearance preference
+
+Browser-local override of the system palette. Not a CMS entity.
+
+| Attribute | Description | Required | Notes |
+|-----------|-------------|----------|-------|
+| key | `pedro-ribeiro-appearance` | Yes | `localStorage` only |
+| value | `light` or `dark` | When saved | Absent → follow system |
+| control | Claro ↔ Escuro | Yes | Header; two options only |
+
+**Rules**: No cookie. No admin force-dark. No third “System” value. Clearing site data restores follow-system.
 
 ### Locale
 
@@ -80,7 +92,7 @@ Two mappings of the same token names. Light is authored default; dark applies if
 | flex layouts | Same layout names as 001; empty layouts omitted per language |
 | publication | EN home unpublished or missing → not found + no EN switcher option |
 
-**Relationships**: One Locale has one Translated home (when published). Menu locations are assigned per Locale. Appearance palette is independent of Locale.
+**Relationships**: One Locale has one Translated home (when published). Menu locations are assigned per Locale. Appearance palette is independent of Locale. Visitor appearance preference is per-browser, not per Locale.
 
 ## State transitions
 
@@ -94,11 +106,15 @@ unassigned or 0 items → fallback chrome
 ### Appearance
 
 ```text
-prefers-color-scheme: light | no-preference → light tokens + color-scheme: light
-prefers-color-scheme: dark                  → dark tokens + color-scheme: dark
+saved localStorage light | dark
+  → that mapping + data-theme + color-scheme (ignore OS)
+
+no saved value:
+  prefers-color-scheme: light | no-preference → light tokens + data-theme=light
+  prefers-color-scheme: dark                  → dark tokens + data-theme=dark
 ```
 
-No other states (no `forced-light` / `forced-dark`).
+No cookie / admin-forced states. No third UI state `system`.
 
 ### English availability
 
