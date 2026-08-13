@@ -1,6 +1,8 @@
 <?php
 /**
- * Template part: Escritos — up to 3 recent posts; omit section if zero.
+ * Template part: Escritos (flex layout `posts`) — native WP posts + ACF labels.
+ *
+ * Sub fields: posts_tag, posts_title. List remains conditional (zero posts → omit).
  *
  * @package Pedro_Ribeiro
  */
@@ -8,6 +10,9 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+$posts_tag   = get_sub_field( 'posts_tag' );
+$posts_title = get_sub_field( 'posts_title' );
 
 $escritos_query = new WP_Query(
 	array(
@@ -28,8 +33,12 @@ if ( ! $escritos_query->have_posts() ) {
 ?>
 <section id="escritos" class="section reveal">
 	<div class="page-shell">
-		<p class="section__label"><?php echo esc_html__( 'Escritos', 'pedro-ribeiro' ); ?></p>
-		<h2 class="section__title"><?php echo esc_html__( 'Textos recentes', 'pedro-ribeiro' ); ?></h2>
+		<?php if ( $posts_tag ) : ?>
+			<p class="section__label"><?php echo esc_html( $posts_tag ); ?></p>
+		<?php endif; ?>
+		<?php if ( $posts_title ) : ?>
+			<h2 class="section__title"><?php echo esc_html( $posts_title ); ?></h2>
+		<?php endif; ?>
 		<ul class="escritos-list">
 			<?php
 			while ( $escritos_query->have_posts() ) :

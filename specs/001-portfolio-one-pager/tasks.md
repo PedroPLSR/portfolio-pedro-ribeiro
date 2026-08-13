@@ -155,7 +155,7 @@ description: "Task list for Portfólio One-Page Pedro Ribeiro"
 
 ### D0 — Owner (not implementer code)
 
-- [ ] T040 **OWNER GATE**: Owner creates ACF field groups in WP admin covering entities in `specs/001-portfolio-one-pager/data-model.md` (Profile, Project cases, Experience entries, Now usernames/toggles only—no API secrets) and syncs JSON into `wp-content/themes/pedro-ribeiro/acf-json/`
+- [X] T040 **OWNER GATE**: Owner creates ACF field groups in WP admin covering entities in `specs/001-portfolio-one-pager/data-model.md` (Profile, Project cases, Experience entries, Now usernames/toggles only—no API secrets) and syncs JSON into `wp-content/themes/pedro-ribeiro/acf-json/`
 
 ### D1 — User Story 6: Owner edits without code (P3)
 
@@ -163,13 +163,13 @@ description: "Task list for Portfólio One-Page Pedro Ribeiro"
 
 **Independent Test**: quickstart P2-02, P2-08.
 
-- [ ] T041 [US6] After T040, map Profile fields via `get_field` in `wp-content/themes/pedro-ribeiro/template-parts/hero.php`, `sobre.php`, `contato.php` using keys from synced JSON only
-- [ ] T042 [US6] After T040, map Project case repeater/fields in `wp-content/themes/pedro-ribeiro/template-parts/projetos.php` (omit link controls when URL empty)
-- [ ] T043 [US6] After T040, map Experience entries in `wp-content/themes/pedro-ribeiro/template-parts/experiencia.php`
-- [ ] T044 [US6] After T040, wire Now config (usernames + visibility toggles only) readable from ACF in `wp-content/themes/pedro-ribeiro/inc/acf.php` or helpers—never store `LASTFM_API_KEY` in ACF
-- [ ] T045 [US6] Confirm secrets only via env/`wp-config` constants documented in `docker/.env.example` and theme bootstrap; no secret fields in admin content UI
+- [X] T041 [US6] After T040, map Profile fields via `get_field` in `wp-content/themes/pedro-ribeiro/template-parts/hero.php`, `sobre.php`, `contato.php` using keys from synced JSON only
+- [X] T042 [US6] After T040, map Project case repeater/fields in `wp-content/themes/pedro-ribeiro/template-parts/projetos.php` (omit link controls when URL empty)
+- [X] T043 [US6] After T040, map Experience entries in `wp-content/themes/pedro-ribeiro/template-parts/experiencia.php`
+- [X] T044 [US6] After T040, wire Now config (usernames + visibility toggles only) readable from ACF in `wp-content/themes/pedro-ribeiro/inc/acf.php` or helpers—never store `LASTFM_API_KEY` in ACF
+- [X] T045 [US6] Confirm secrets only via env/`wp-config` constants documented in `docker/.env.example` and theme bootstrap; no secret fields in admin content UI
 
-**Checkpoint**: US6 satisfied for editorial content. Now still not live until Phase E.
+**Checkpoint**: US6 satisfied for editorial content. Now still not live until Phase E. ✅ Phase D complete (Chat 3).
 
 ---
 

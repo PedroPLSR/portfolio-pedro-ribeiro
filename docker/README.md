@@ -41,7 +41,9 @@ Defaults (override in `.env`):
 1. Open WordPress URL → complete install wizard.
 2. In theme folder: `npm install && npm run build`.
 3. Appearance → Themes → activate **Pedro Ribeiro**.
-4. ACF plugin + owner JSON sync come later (Phase D).
+4. Install/activate ACF; field group JSON lives in the theme `acf-json/` (synced by owner).
+5. Set a static front page (Reading settings) and fill `flex_content` layouts in admin.
+6. `LASTFM_API_KEY` belongs in `docker/.env` (or `wp-config`); never in ACF.
 
 ## Production note
 

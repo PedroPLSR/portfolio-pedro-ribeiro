@@ -32,6 +32,10 @@ wp-content/languages/
 *.sql
 *.sql.gz
 
+# PHP / Composer (if added later)
+vendor/
+*.cache
+
 # Logs & caches
 *.log
 npm-debug.log*
@@ -50,3 +54,7 @@ Desktop.ini
 # Editors (keep project rules/skills if needed via force-add)
 .idea/
 *.iml
+
+# Example files (used for development)
+page-exemplo.php
+front-page-exemple.php
