@@ -238,7 +238,7 @@
                         {
                             "key": "field_6a7b25537da59",
                             "label": "Projetos",
-                            "name": "projetos",
+                            "name": "project_list",
                             "aria-label": "",
                             "type": "repeater",
                             "instructions": "",
@@ -249,7 +249,7 @@
                                 "class": "",
                                 "id": ""
                             },
-                            "layout": "table",
+                            "layout": "block",
                             "min": 0,
                             "max": 0,
                             "collapsed": "",
@@ -536,7 +536,7 @@
                                 "class": "",
                                 "id": ""
                             },
-                            "layout": "table",
+                            "layout": "block",
                             "min": 0,
                             "max": 0,
                             "collapsed": "",
@@ -849,5 +849,5 @@
     "description": "",
     "show_in_rest": 0,
     "display_title": "",
-    "modified": 1786457576
+    "modified": 1786483278
 }

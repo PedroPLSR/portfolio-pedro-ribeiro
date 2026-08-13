@@ -1,29 +1,41 @@
 <?php
 /**
- * Fallback index.
+ * Template Name: Home
+ *
+ * Front page flexible content: flex_content on page_on_front.
  *
  * @package Pedro_Ribeiro
  */
 
 get_header();
+
+$home_id = (int) get_option( 'page_on_front' );
 ?>
-<main class="editorial">
-	<div class="page-shell">
-		<?php if ( have_posts() ) : ?>
-			<ul class="archive-list">
-				<?php
-				while ( have_posts() ) :
-					the_post();
-					?>
-					<li class="archive-list__item">
-						<a href="<?php echo esc_url( get_permalink() ); ?>"><?php echo esc_html( get_the_title() ); ?></a>
-					</li>
-				<?php endwhile; ?>
-			</ul>
-		<?php else : ?>
-			<p class="section__lead"><?php echo esc_html__( 'Nenhum conteúdo encontrado.', 'pedro-ribeiro' ); ?></p>
-		<?php endif; ?>
-	</div>
+<main>
+	<?php if ( $home_id && function_exists( 'have_rows' ) && have_rows( 'flex_content', $home_id ) ) : ?>
+		<?php
+		while ( have_rows( 'flex_content', $home_id ) ) :
+			the_row();
+			$layout = get_row_layout();
+
+			if ( 'hero' === $layout ) {
+				get_template_part( 'template-parts/hero' );
+			} elseif ( 'about' === $layout ) {
+				get_template_part( 'template-parts/sobre' );
+			} elseif ( 'projects' === $layout ) {
+				get_template_part( 'template-parts/projetos' );
+			} elseif ( 'experience' === $layout ) {
+				get_template_part( 'template-parts/experiencia' );
+			} elseif ( 'now' === $layout ) {
+				get_template_part( 'template-parts/now' );
+			} elseif ( 'posts' === $layout ) {
+				get_template_part( 'template-parts/escritos' );
+			} elseif ( 'contact' === $layout ) {
+				get_template_part( 'template-parts/contato' );
+			}
+		endwhile;
+		?>
+	<?php endif; ?>
 </main>
 <?php
 get_footer();

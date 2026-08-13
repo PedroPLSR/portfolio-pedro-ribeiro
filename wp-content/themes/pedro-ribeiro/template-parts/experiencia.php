@@ -1,6 +1,9 @@
 <?php
 /**
- * Template part: Experiência / Formação.
+ * Template part: Experiência (flex layout `experience`).
+ *
+ * Sub fields: experience_tag, experience_title, experience_list
+ * (period, title, org_title, desc).
  *
  * @package Pedro_Ribeiro
  */
@@ -9,39 +12,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$entries = array(
-	array(
-		'period' => 'Atual',
-		'title'  => 'Desenvolvedor full-stack',
-		'org'    => 'Index Digital',
-		'note'   => 'Sites e produtos digitais com WordPress e Laravel — temas, CMS, front e integrações para clientes institucionais e imobiliários.',
-	),
-	array(
-		'period' => 'Graduação',
-		'title'  => 'Ciência da Computação',
-		'org'    => 'UNIFOR — Universidade de Fortaleza',
-		'note'   => '',
-	),
-	array(
-		'period' => 'Pós-graduação',
-		'title'  => 'Pós-graduação em Computação',
-		'org'    => 'UNIFOR — Universidade de Fortaleza',
-		'note'   => 'Continuação da formação técnica alinhada a engenharia de software e sistemas web.',
-	),
-);
+$experience_tag   = get_sub_field( 'experience_tag' );
+$experience_title = get_sub_field( 'experience_title' );
+$experience_list  = get_sub_field( 'experience_list' );
+
+if ( ! $experience_tag && ! $experience_title && ! $experience_list ) {
+	return;
+}
+
 ?>
 <section id="experiencia" class="section reveal">
 	<div class="page-shell">
-		<p class="section__label"><?php echo esc_html__( 'Experiência & formação', 'pedro-ribeiro' ); ?></p>
-		<h2 class="section__title"><?php echo esc_html__( 'Percurso', 'pedro-ribeiro' ); ?></h2>
+		<?php if ( $experience_tag ) : ?>
+			<p class="section__label"><?php echo esc_html( $experience_tag ); ?></p>
+		<?php endif; ?>
+		<?php if ( $experience_title ) : ?>
+			<h2 class="section__title"><?php echo esc_html( $experience_title ); ?></h2>
+		<?php endif; ?>
 		<ol class="timeline">
-			<?php foreach ( $entries as $entry ) : ?>
+			<?php foreach ( $experience_list as $item ) : ?>
 				<li class="timeline__item">
-					<span class="timeline__period"><?php echo esc_html( $entry['period'] ); ?></span>
-					<h3 class="timeline__title"><?php echo esc_html( $entry['title'] ); ?></h3>
-					<p class="timeline__org"><?php echo esc_html( $entry['org'] ); ?></p>
-					<?php if ( ! empty( $entry['note'] ) ) : ?>
-						<p class="timeline__note"><?php echo esc_html( $entry['note'] ); ?></p>
+					<?php if ( $item['period'] ) : ?>
+						<span class="timeline__period"><?php echo esc_html( $item['period'] ); ?></span>
+					<?php endif; ?>
+					<?php if ( $item['title'] ) : ?>
+						<h3 class="timeline__title"><?php echo esc_html( $item['title'] ); ?></h3>
+					<?php endif; ?>
+					<?php if ( $item['org_title'] ) : ?>
+						<p class="timeline__org"><?php echo esc_html( $item['org_title'] ); ?></p>
+					<?php endif; ?>
+					<?php if ( $item['desc'] ) : ?>
+						<div class="timeline__note"><?php echo wp_kses_post( $item['desc'] ); ?></div>
 					<?php endif; ?>
 				</li>
 			<?php endforeach; ?>

@@ -1,6 +1,8 @@
 <?php
 /**
- * Template part: Contato (links only — no form).
+ * Template part: Contato (flex layout `contact`).
+ *
+ * Sub fields: contact_tag, contact_title, contact_desc, contact_list (title, link).
  *
  * @package Pedro_Ribeiro
  */
@@ -9,62 +11,61 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$email      = 'pedro.ribeiro@example.com';
-$whatsapp   = 'https://wa.me/5585999999999';
-$linkedin   = 'https://www.linkedin.com/in/pedro-ribeiro';
-$github     = 'https://github.com/pedro-ribeiro';
-$cv_url     = get_template_directory_uri() . '/public/curriculo.pdf';
-$cv_path    = get_template_directory() . '/public/curriculo.pdf';
-$has_cv     = file_exists( $cv_path );
+$contact_tag   = get_sub_field( 'contact_tag' );
+$contact_title = get_sub_field( 'contact_title' );
+$contact_desc  = get_sub_field( 'contact_desc' );
+$contact_list  = get_sub_field( 'contact_list' );
+
+$items = array();
+if ( ! empty( $contact_list ) && is_array( $contact_list ) ) {
+	foreach ( $contact_list as $row ) {
+		$link = $row['link'] ?? null;
+		if ( empty( $link['url'] ) ) {
+			continue;
+		}
+		$items[] = $row;
+	}
+}
+
+if ( ! $contact_tag && ! $contact_title && ! $contact_desc && empty( $items ) ) {
+	return;
+}
 ?>
 <section id="contato" class="section reveal">
 	<div class="page-shell">
-		<p class="section__label"><?php echo esc_html__( 'Contato', 'pedro-ribeiro' ); ?></p>
-		<h2 class="section__title"><?php echo esc_html__( 'Vamos conversar', 'pedro-ribeiro' ); ?></h2>
-		<p class="section__lead">
-			<?php echo esc_html__( 'Sem formulário — escolha o canal. Currículo em PDF disponível para download.', 'pedro-ribeiro' ); ?>
-		</p>
-		<ul class="contact-list">
-			<?php if ( $email ) : ?>
-				<li>
-					<a href="<?php echo esc_url( 'mailto:' . $email ); ?>">
-						<span class="contact-list__label"><?php echo esc_html__( 'Email', 'pedro-ribeiro' ); ?></span>
-						<span><?php echo esc_html( $email ); ?></span>
-					</a>
-				</li>
-			<?php endif; ?>
-			<?php if ( $whatsapp ) : ?>
-				<li>
-					<a href="<?php echo esc_url( $whatsapp ); ?>" target="_blank" rel="noopener noreferrer">
-						<span class="contact-list__label"><?php echo esc_html__( 'WhatsApp', 'pedro-ribeiro' ); ?></span>
-						<span><?php echo esc_html__( 'Abrir conversa', 'pedro-ribeiro' ); ?></span>
-					</a>
-				</li>
-			<?php endif; ?>
-			<?php if ( $linkedin ) : ?>
-				<li>
-					<a href="<?php echo esc_url( $linkedin ); ?>" target="_blank" rel="noopener noreferrer">
-						<span class="contact-list__label"><?php echo esc_html__( 'LinkedIn', 'pedro-ribeiro' ); ?></span>
-						<span><?php echo esc_html( 'linkedin.com/in/pedro-ribeiro' ); ?></span>
-					</a>
-				</li>
-			<?php endif; ?>
-			<?php if ( $github ) : ?>
-				<li>
-					<a href="<?php echo esc_url( $github ); ?>" target="_blank" rel="noopener noreferrer">
-						<span class="contact-list__label"><?php echo esc_html__( 'GitHub', 'pedro-ribeiro' ); ?></span>
-						<span><?php echo esc_html( 'github.com/pedro-ribeiro' ); ?></span>
-					</a>
-				</li>
-			<?php endif; ?>
-			<?php if ( $has_cv ) : ?>
-				<li>
-					<a href="<?php echo esc_url( $cv_url ); ?>" download>
-						<span class="contact-list__label"><?php echo esc_html__( 'Currículo', 'pedro-ribeiro' ); ?></span>
-						<span><?php echo esc_html__( 'Baixar PDF', 'pedro-ribeiro' ); ?></span>
-					</a>
-				</li>
-			<?php endif; ?>
-		</ul>
+		<?php if ( $contact_tag ) : ?>
+			<p class="section__label"><?php echo esc_html( $contact_tag ); ?></p>
+		<?php endif; ?>
+		<?php if ( $contact_title ) : ?>
+			<h2 class="section__title"><?php echo esc_html( $contact_title ); ?></h2>
+		<?php endif; ?>
+		<?php if ( $contact_desc ) : ?>
+			<div class="section__lead">
+				<?php echo wp_kses_post( $contact_desc ); ?>
+			</div>
+		<?php endif; ?>
+		<?php if ( ! empty( $items ) ) : ?>
+			<ul class="contact-list">
+				<?php foreach ( $items as $item ) : ?>
+					<?php $link = $item['link']; ?>
+					<li>
+						<a
+							href="<?php echo esc_url( $link['url'] ); ?>"
+							<?php if ( ! empty( $link['target'] ) ) : ?>
+								target="<?php echo esc_attr( $link['target'] ); ?>"
+								rel="noopener noreferrer"
+							<?php endif; ?>
+						>
+							<?php if ( ! empty( $item['title'] ) ) : ?>
+								<span class="contact-list__label"><?php echo esc_html( $item['title'] ); ?></span>
+							<?php endif; ?>
+							<?php if ( ! empty( $link['title'] ) ) : ?>
+								<span><?php echo esc_html( $link['title'] ); ?></span>
+							<?php endif; ?>
+						</a>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		<?php endif; ?>
 	</div>
 </section>
