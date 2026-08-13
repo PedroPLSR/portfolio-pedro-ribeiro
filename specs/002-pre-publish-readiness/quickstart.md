@@ -53,23 +53,26 @@ Menus from A may already be present.
 
 ### Setup
 
-1. Change tokens in `src/styles/main.css`; `npm run build`.
-2. Test with OS/browser appearance light and dark (DevTools “emulate prefers-color-scheme” is enough).
+1. Token remap + `data-theme` in `src/styles/main.css`; anti-FOUC script + Claro ↔ Escuro in `header.php`; `npm run build`.
+2. Test with OS/browser appearance light and dark (DevTools “emulate prefers-color-scheme”), then with `localStorage` override.
 
 ### Validation
 
 | ID | Scenario | Expected |
 |----|----------|----------|
-| B-01 | System light | Current cool off-white look; no dark overlay |
-| B-02 | System dark | Dark canvas, light ink, petrol accent; header/footer/Now/contact readable |
-| B-03 | No toggle | Zero appearance controls in header, footer, home |
-| B-04 | Change OS appearance while page is open | Palette updates without navigating |
-| B-05 | FOUC | Hard reload in dark: first paint is already dark (no full-page light flash) |
-| B-06 | Contrast | Text + essential controls meet WCAG 2.2 AA in **light and dark** (contrast checker) |
-| B-07 | Visual ban | Not purple/indigo/neon “AI dark”; light identity still recognizable |
-| B-08 | Regression | A-07 still true; light system unchanged from pre-B |
+| B-01 | System light, no `localStorage` | Current cool off-white look; `data-theme="light"`; no dark overlay |
+| B-02 | System dark, no `localStorage` | Dark canvas, light ink, petrol accent; header/footer/Now/contact readable |
+| B-03 | Header control | Compact **Claro ↔ Escuro** in the header (exactly two options); does not overpower brand; not a menu item; not in footer as a second control |
+| B-04 | No saved preference; change OS appearance while page is open | Palette updates without navigating |
+| B-05 | FOUC | Hard reload while resolved dark (system or saved): first paint is already dark (inline head script; no full-page light flash) |
+| B-06 | Contrast | Text + essential controls (including the appearance control) meet WCAG 2.2 AA in **light and dark** |
+| B-07 | Visual ban | Not purple/indigo/neon “AI dark”; light identity still recognizable when light is resolved |
+| B-08 | Regression | A-07 still true; light system with nothing saved unchanged from pre-B |
+| B-09 | Toggle to the opposite of system, then reload | `localStorage` has `light` or `dark`; same explicit palette after reload even if OS differs |
+| B-10 | Saved preference; change OS appearance while page is open | Palette stays on the saved mapping (OS does not override) |
+| B-11 | Storage / admin | Appearance uses `localStorage` only; no appearance cookie; no admin “force dark”; no third “System” option |
 
-**Chat gate**: B-01–B-08 pass → stop. Do not install Polylang in this chat unless already there (must still work without it).
+**Chat gate**: B-01–B-11 pass → stop. Do not install Polylang in this chat unless already there (must still work without it).
 
 ---
 

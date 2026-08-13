@@ -11,10 +11,42 @@
   --color-accent: #1a5f6e;
   --color-accent-soft: #2a7a8c;
   --color-line: color-mix(in oklab, var(--color-ink) 12%, transparent);
+  --color-on-accent: #f7fbfc;
 
   --spacing-section: clamp(4.5rem, 10vw, 7.5rem);
   --max-width-prose: 42rem;
   --max-width-page: 72rem;
+}
+
+/* Dark tokens: attribute wins; media query only if data-theme is unset (no JS). */
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --color-canvas: #121a1e;
+  --color-canvas-deep: #0e1518;
+  --color-ink: #e8eef1;
+  --color-ink-muted: #a8b8c0;
+  --color-accent: #5eb3c0;
+  --color-accent-soft: #7ac4ce;
+  --color-line: color-mix(in oklab, var(--color-ink) 16%, transparent);
+  --color-on-accent: #0e1518;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) {
+    color-scheme: dark;
+    --color-canvas: #121a1e;
+    --color-canvas-deep: #0e1518;
+    --color-ink: #e8eef1;
+    --color-ink-muted: #a8b8c0;
+    --color-accent: #5eb3c0;
+    --color-accent-soft: #7ac4ce;
+    --color-line: color-mix(in oklab, var(--color-ink) 16%, transparent);
+    --color-on-accent: #0e1518;
+  }
 }
 
 @layer base {
@@ -34,7 +66,7 @@
   }
 
   ::selection {
-    background: color-mix(in oklab, var(--color-accent) 28%, white);
+    background: color-mix(in oklab, var(--color-accent) 28%, var(--color-on-accent));
   }
 
   a {
@@ -54,7 +86,7 @@
   min-height: 100dvh;
   background:
     radial-gradient(ellipse 90% 55% at 12% -10%, color-mix(in oklab, var(--color-accent) 16%, transparent), transparent 55%),
-    radial-gradient(ellipse 70% 50% at 92% 8%, color-mix(in oklab, var(--color-canvas-deep) 90%, #9bb8b0), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 92% 8%, color-mix(in oklab, var(--color-canvas-deep) 90%, var(--color-accent-soft)), transparent 50%),
     radial-gradient(ellipse 60% 40% at 70% 100%, color-mix(in oklab, var(--color-accent) 8%, transparent), transparent 55%),
     linear-gradient(165deg, var(--color-canvas) 0%, var(--color-canvas-deep) 100%);
 }
@@ -101,6 +133,15 @@
   padding-block: 0.75rem;
 }
 
+.site-nav__tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.15rem;
+  min-width: 0;
+}
+
 .site-nav__brand {
   font-family: var(--font-display);
   font-size: 0.9375rem;
@@ -131,6 +172,45 @@
 .site-nav__list a:hover,
 .site-nav__list a:focus-visible {
   color: var(--color-accent);
+}
+
+.site-appearance {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.site-appearance__option {
+  margin: 0;
+  padding: 0.15rem 0.1rem;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.site-appearance__option[aria-pressed="true"] {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.site-appearance__option:hover,
+.site-appearance__option:focus-visible {
+  color: var(--color-accent);
+}
+
+.site-appearance__sep {
+  color: var(--color-ink-muted);
+  opacity: 0.4;
+  font-size: 0.75rem;
+  user-select: none;
 }
 
 /* Hero — full-bleed typographic composition */
@@ -186,7 +266,7 @@
 
 .btn--primary {
   background: var(--btn-bg, var(--color-accent));
-  color: #f7fbfc;
+  color: var(--color-on-accent);
 }
 
 .btn--primary:hover,
@@ -363,7 +443,7 @@
   padding: 1.1rem 1.25rem;
   border: 1px solid var(--color-line);
   border-radius: 0.35rem;
-  background: color-mix(in oklab, white 55%, var(--color-canvas));
+  background: color-mix(in oklab, var(--color-on-accent) 55%, var(--color-canvas));
 }
 
 .now-card__label {
@@ -727,6 +807,7 @@ a.now-card__title:focus-visible {
   .case,
   .btn,
   .site-nav__list a,
+  .site-appearance__option,
   .site-footer__list a,
   .contact-list a {
     transition: none;
