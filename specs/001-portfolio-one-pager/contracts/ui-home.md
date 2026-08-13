@@ -56,8 +56,8 @@ Suggested anchor IDs (stable for nav/CTAs):
 ## Now
 
 - Secondary title conveying live integrations (e.g. “Integrações ao vivo”).
-- Parts: **Ouvindo**, **Jogando** — each at most one current item.
-- Omit failed/empty parts; omit whole `#now` if nothing to show.
+- Parts: **Ouvindo**, **Última review** — each at most one item (listening: nowplaying or last scrobble; Backloggd: latest public review with cover/text/optional stars). Labels fixed as named.
+- Omit failed/empty/hidden parts; omit whole `#now` if nothing to show.
 - No error / unavailable messaging.
 - Full behavior: [now-integrations.md](./now-integrations.md).
 

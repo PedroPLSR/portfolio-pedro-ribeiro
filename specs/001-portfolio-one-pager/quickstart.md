@@ -54,7 +54,7 @@ Phase 1 **visual stability** accepted → only then start phase 2.
 3. Install WordPress in the browser; install/activate ACF; activate theme `pedro-ribeiro`.
 4. Owner: create ACF groups from [data-model.md](./data-model.md); sync JSON to `acf-json/`.
 5. Theme: `npm install && npm run build` (or `dev`) inside the theme for Vite assets.
-6. Fill content in admin; set Now usernames/toggles; keep API key out of ACF.
+6. Fill content in admin; set Now usernames; leave “Esconder API…” unchecked to expose sources (checked hides); keep API key out of ACF.
 
 ### Validation scenarios
 
@@ -62,9 +62,11 @@ Phase 1 **visual stability** accepted → only then start phase 2.
 |----|----------|----------|
 | P2-01 | Markup port | Same section order/visual language as accepted phase 1 |
 | P2-02 | ACF edit | Change hero text + project image in admin → public page updates on refresh |
-| P2-03 | Now both live | Ouvindo + Jogando each show one current item when sources have current activity |
-| P2-04 | Now partial | Disable or break one source → only the other part shows; no error UI |
-| P2-05 | Now empty | Both fail/empty → `#now` not rendered; rest of page OK |
+| P2-03 | Now both live | Ouvindo + Última review each show one item (listening: nowplaying or last scrobble; Backloggd: latest `/reviews/` card with truncated text) |
+| P2-03b | Now Last.fm idle | No nowplaying but recent scrobble exists → Ouvindo still shows last track under “Ouvindo” |
+| P2-03c | Now Backloggd review | Reviews page has ≥1 card → Última review shows title, cover, ~100-char text, stars when present; no “Jogando” label |
+| P2-04 | Now partial | Hide (“Esconder…”) or break one source → only the other part shows; no error UI |
+| P2-05 | Now empty | Both fail/empty/hidden → `#now` not rendered; rest of page OK |
 | P2-06 | Escritos empty | Zero published posts → Escritos section absent |
 | P2-07 | Escritos with posts | Publish ≥1 post → section lists up to 3; single/archive usable |
 | P2-08 | Secrets | API key not visible in admin content fields or front HTML source as a dedicated field |

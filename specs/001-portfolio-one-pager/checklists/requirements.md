@@ -32,6 +32,8 @@
 ## Notes
 
 - Validation passed on 2026-08-10 (iteration 1).
+- Re-validated 2026-08-13 after clarify session (Last.fm last-scrobble fallback, Ouvindo label, hide toggles) — all items still pass.
+- Re-validated 2026-08-13 after Backloggd “Última review” clarify (~100 char truncation) — all items still pass.
 - Stack/governance details (WordPress, ACF, Docker, specific APIs) are referenced only in Assumptions as constitution-aligned delivery constraints, not as success-criteria implementation.
 - Product names in positioning (WordPress & Laravel) and Now source names in Assumptions are intentional product identity, not build instructions.
-- Ready for `/speckit-clarify` (optional) or `/speckit-plan`.
+- Ready for `/speckit-plan` or direct theme update of Last.fm fetcher against updated FR-007 / contracts.

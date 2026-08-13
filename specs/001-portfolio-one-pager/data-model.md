@@ -73,9 +73,9 @@ Admin-tunable settings for live integrations (not API secrets).
 | Attribute | Description | Required | Notes |
 |-----------|-------------|----------|-------|
 | lastfm_username | Last.fm user | Optional | Needed if Ouvindo enabled |
-| backloggd_username | Backloggd user | Optional | Needed if Jogando enabled |
-| show_listening | Toggle Ouvindo | Optional | Default on if username set |
-| show_gaming | Toggle Jogando | Optional | Default on if username set |
+| backloggd_username | Backloggd user | Optional | Needed if Última review enabled |
+| show_listening | Hide toggle for Ouvindo (ACF label "Esconder…") | Optional | Checked = hide; unchecked = expose (default) |
+| show_gaming | Hide toggle for Última review (ACF label "Esconder…") | Optional | Checked = hide; unchecked = expose (default) |
 
 **Secrets (not ACF content)**:
 - `LASTFM_API_KEY` — environment / `wp-config` only.
@@ -86,12 +86,14 @@ Derived at request time from external sources + transients.
 
 | Attribute | Description | Rules |
 |-----------|-------------|-------|
-| listening | Current track (title, artist, optional art/url) | Only if now-playing; else absent |
-| gaming | Current game (title, optional url) | First playing item; else absent |
+| listening | Track (title, artist, optional art/url) | Prefer nowplaying; else last scrobble; absent on fail/empty |
+| gaming | Latest review (title, image_url?, review, rating?, url?) | First `.review-card` on `/reviews/`; absent on fail/empty/parse |
 
 **State**:
 - Both absent → do not render Now section.
 - One present → render only that part.
+- Listening UI label always "Ouvindo"; Backloggd label always "Última review".
+- Review text truncated to ~100 characters + “…” in UI.
 - Never persist as editorial CMS content.
 
 ### Written post

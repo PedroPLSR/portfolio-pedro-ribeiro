@@ -1,6 +1,6 @@
 # Research: Portfólio One-Page Pedro Ribeiro
 
-**Feature**: `001-portfolio-one-pager` | **Date**: 2026-08-10
+**Feature**: `001-portfolio-one-pager` | **Date**: 2026-08-10 (R4/R5/R6/R11 updated 2026-08-13)
 
 ## R1 — Phase split & repository layout
 
@@ -34,33 +34,44 @@
 
 ## R4 — Last.fm (Ouvindo)
 
-**Decision**: Official Last.fm API `user.getRecentTracks` via `wp_remote_get`. Treat as “current” only when the first track has `@attr.nowplaying === true` (or equivalent). Otherwise omit Ouvindo. Cache with a WordPress transient (suggested TTL ~5 minutes; tunable). API key from env/`wp-config` only.
+**Decision**: Official Last.fm API `user.getRecentTracks` via `wp_remote_get`. Prefer the first track when `@attr.nowplaying === true`; otherwise fall back to the most recent scrobble. Omit Ouvindo only on failure or empty track list. Still one item (not a history list). Cache with a WordPress transient (suggested TTL ~5 minutes; tunable). API key from env/`wp-config` only. UI label always "Ouvindo".
 
-**Rationale**: Spec clarification requires current item only, not recent history. Official API is stable and matches constitution.
+**Rationale**: Clarification 2026-08-13 — portfolio should still show listening activity when idle; nowplaying remains preferred when available.
 
 **Alternatives considered**:
-- Always show last scrobble — rejected (clarification: current only; empty → omit).
+- Nowplaying-only (omit when idle) — superseded 2026-08-13.
+- Always show last scrobble even when nowplaying exists — rejected (prefer live nowplaying).
 - Client-side fetch with exposed key — insecure.
 
-## R5 — Backloggd (Jogando)
+## R5 — Backloggd (Última review)
 
-**Decision**: No official API. Fetch the user’s public “playing” profile page with `wp_remote_get`, parse the first currently-playing game (title + optional URL), cache in a transient. On HTTP/parse failure or empty playing list → omit Jogando. Username from ACF/config; no secret required for public scrape (still treat timeouts like API failures).
+**Decision**: No official API. Fetch the user’s public reviews page `https://www.backloggd.com/u/{username}/reviews/` with `wp_remote_get`, parse the **first** `.review-card` for game name (`title`), cover (`image_url`), review body (`review`), optional star rating from `.stars-top` width%, and optional review/game URL. Cache in a transient. On HTTP/parse failure, bot wall, or empty list → omit the block. UI label **"Última review"** (not “Jogando”). Truncate review text to ~100 characters + “…” in the theme UI. Aggregator may keep the key `gaming` (ACF `show_gaming`) with this expanded review shape. Username from ACF/config; no secret required.
 
-**Rationale**: Matches constitution (“API não oficial” + `wp_remote_get`). Community tools (go-backloggd scrapers, automate-now) confirm HTML scrape of the playing list is the practical approach. Spec wants at most one current item → take the first playing entry.
+**Rationale**: Clarification 2026-08-13 — currently-playing scrape is less useful/reliable than showing the latest public review. Constitution still allows unofficial HTML via `wp_remote_get` + silent degrade.
 
 **Alternatives considered**:
+- `/playing/` currently-playing scrape — superseded 2026-08-13.
 - Third-party Go/Python scrapers as sidecar — extra runtime, violates YAGNI for v1.
-- Skip Backloggd until official API — contradicts product requirement for dual Now demos.
+- Skip Backloggd until official API — contradicts dual Now demos.
+- Rename aggregator key to `review` — optional later; keep `gaming` for ACF continuity unless implement chooses rename.
 
-**Risk**: Markup changes on Backloggd can break the parser. Mitigate with short timeout, transient cache, and silent omit (already required).
+**Risk**: Markup changes on Backloggd (or Anubis bot walls) can break the parser. Mitigate with short timeout, transient cache, and silent omit (already required).
 
 ## R6 — Now degrade UX
 
-**Decision**: Per-source omit on failure/empty; show Now only if ≥1 current item; omit entire section if none. No error or “unavailable” copy.
+**Decision**: Per-source omit on failure/empty/hidden; show Now only if ≥1 displayable item; omit entire section if none. No error or “unavailable” copy. Listening labeled “Ouvindo”; Backloggd labeled “Última review”.
 
-**Rationale**: Spec clarifications session 2026-08-10.
+**Rationale**: Spec clarifications 2026-08-10 (partial omit) + 2026-08-13 (last-scrobble, hide toggles, latest review).
 
-**Alternatives considered**: Always show headings with placeholders — rejected.
+**Alternatives considered**: Always show headings with placeholders — rejected. Alternate “Última” label for idle Last.fm — rejected 2026-08-13. “Jogando” for Backloggd — superseded 2026-08-13.
+
+## R11 — ACF Now hide toggles
+
+**Decision**: Owner JSON fields named `show_listening` / `show_gaming` use admin labels “Esconder API…”. Treat checked/true as **hide** (skip fetch, that side `null`); unchecked/false as **expose** (default). Do not invent new ACF keys—map semantics from labels + clarify session.
+
+**Rationale**: Clarification 2026-08-13; matches admin UX and avoids inverted enable logic.
+
+**Alternatives considered**: Interpret field names as show-when-checked — rejected (contradicts labels and owner intent).
 
 ## R7 — Escritos
 

@@ -14,6 +14,7 @@ define( 'PEDRO_RIBEIRO_DIR', get_template_directory() );
 define( 'PEDRO_RIBEIRO_URI', get_template_directory_uri() );
 
 require_once PEDRO_RIBEIRO_DIR . '/inc/acf.php';
+require_once PEDRO_RIBEIRO_DIR . '/inc/now.php';
 
 /**
  * Theme setup.
