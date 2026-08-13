@@ -1,12 +1,25 @@
 # Implementation Plan: Portfólio One-Page Pedro Ribeiro
 
-**Branch**: `001-portfolio-one-pager` | **Date**: 2026-08-10 | **Spec**: [spec.md](./spec.md)
+**Branch**: `001-portfolio-one-pager` | **Date**: 2026-08-10 (updated 2026-08-13) | **Spec**: [spec.md](./spec.md)
 
 **Input**: Feature specification from `/specs/001-portfolio-one-pager/spec.md`
 
 ## Summary
 
 Build a recruiter-facing one-pager for Pedro Ribeiro in two constitution-mandated phases: (1) a visually complete static front in `frontend/` (HTML/CSS/JS + Tailwind via Vite) with hardcoded copy, persistent in-page nav, typographic/atmospheric hero, Escritos omitted, and Now mocked or omitted; (2) after visual acceptance, Dockerized WordPress + custom Underscores theme that ports markup, wires owner-authored ACF JSON (no invented field keys in this plan), live Now via `wp_remote_get` + transients (Last.fm + Backloggd), and conditional Escritos with minimal editorial `single`/`archive`. WordPress core is never committed to Git.
+
+### Clarify delta (2026-08-13) — Now behavior only
+
+Stack and delivery order unchanged. Spec/contracts already record:
+
+| Topic | Decision |
+|-------|----------|
+| Last.fm item | Prefer `@attr.nowplaying`; else fall back to most recent scrobble (still one item) |
+| Listening label | Always **"Ouvindo"** (no “Última” / alternate wording) |
+| ACF toggles | Admin labels “Esconder API…”: **checked = hide** source; **unchecked = expose** (default) |
+| Backloggd | Latest public review from `/u/{username}/reviews/` (first `.review-card`: title, cover, review text ~100 chars, stars from `.stars-top` width% when available). Label **"Última review"** (not “Jogando”). Aggregator key may stay `gaming` with expanded review shape. Do **not** use `/playing/`. |
+
+See [research.md](./research.md) R4/R5/R6/R11, [contracts/now-integrations.md](./contracts/now-integrations.md), FR-007 / FR-014.
 
 ## Technical Context
 
@@ -26,7 +39,7 @@ Build a recruiter-facing one-pager for Pedro Ribeiro in two constitution-mandate
 
 **Constraints**: Front-first gate; no headless / Filament / contact form / dark-mode default; no career-level labels; secrets out of Git; phpMyAdmin local-only; do not invent ACF field keys—owner creates groups in admin then syncs JSON; WP core not in repo
 
-**Scale/Scope**: One home one-pager + minimal post templates; 2–4 project cases; two Now sources (current item only each)
+**Scale/Scope**: One home one-pager + minimal post templates; 2–4 project cases; two Now sources (one item each: listening = nowplaying or last scrobble; Backloggd = latest public review)
 
 ## Constitution Check
 
@@ -39,12 +52,12 @@ Build a recruiter-facing one-pager for Pedro Ribeiro in two constitution-mandate
 | III. Front honesto | Pass | Real HTML/CSS/JS; Tailwind + Vite; no page builders |
 | IV. Design editorial técnico | Pass | Brand-first typographic hero allowed; no hero cards; banned AI looks; no dark default |
 | V. One-pager focado | Pass | Section order + skills-in-cases + conditional Escritos + contact links only |
-| VI. Integrações resilientes | Pass | `wp_remote_get` + transients; silent degrade; keys in env/wp-config |
+| VI. Integrações resilientes | Pass | `wp_remote_get` + transients; silent degrade; keys in env/wp-config; Last.fm idle → last scrobble; Backloggd latest review scrape (clarify 2026-08-13) |
 | VII. Dev reproduzível | Pass | Docker Compose documented; secrets gitignored; phpMyAdmin local profile only |
 | VIII. Simplicidade / YAGNI | Pass | No headless/parallel CMS; Escritos slot future-ready without mandatory posts |
 | Development Order | Pass | Phase 1 `frontend/` before any WP/CMS work |
 
-**Post-design re-check**: Artifacts below keep ACF as owner-authored (no invented keys), keep WP core out of Git, and preserve front-first structure — gates still Pass.
+**Post-design re-check**: Artifacts below keep ACF as owner-authored (no invented keys), keep WP core out of Git, and preserve front-first structure — gates still Pass. Re-check 2026-08-13: Now clarify (last-scrobble fallback, hide toggles, “Ouvindo”, Backloggd **Última review** instead of playing) does not change stack or constitution gates — still Pass.
 
 ## Project Structure
 
@@ -132,9 +145,9 @@ wp-content/                    # Mounted into container; only theme (+ later ACF
 1. Docker Compose: WordPress + MySQL + phpMyAdmin (compose profile/service tagged local-only).
 2. Scaffold theme from Underscores; port markup into `template-parts/*`; Vite builds theme assets.
 3. **ACF**: Owner creates field groups in WP admin covering conceptual entities (see `data-model.md`). Owner syncs JSON into `acf-json/`. Theme code then wires `get_field` / loops — **do not invent field keys in plan/tasks ahead of that JSON**.
-4. Now: Last.fm + Backloggd fetchers (`wp_remote_get`, timeouts, transients); render current item only; partial/empty → omit parts or whole section.
+4. Now: Last.fm + Backloggd fetchers (`wp_remote_get`, timeouts, transients); one item per source — Last.fm prefers nowplaying then last scrobble (label “Ouvindo”); Backloggd scrapes `/reviews/` first `.review-card` (title, cover, truncated review, optional stars/url; label “Última review”); ACF “Esconder…” checked hides that source; partial/empty/hidden → omit parts or whole section.
 5. Escritos: query up to 3 recent posts on front-page partial; hide section if zero; ship minimal editorial `single.php` / `archive.php`.
-6. Secrets via env / `wp-config` constants; Never in ACF content fields.
+6. Secrets via env / `wp-config` constants; never in ACF content fields.
 7. Document local up and production note (no phpMyAdmin).
 
 ## Design Artifacts

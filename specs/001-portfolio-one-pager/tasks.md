@@ -175,21 +175,22 @@ description: "Task list for Portfólio One-Page Pedro Ribeiro"
 
 ## Phase E: Now live (Chat 4)
 
-**Purpose**: Last.fm + Backloggd current-item integrations per `contracts/now-integrations.md`.
+**Purpose**: Last.fm + Backloggd integrations per `contracts/now-integrations.md` (clarify 2026-08-13: Last.fm nowplaying → else last scrobble / “Ouvindo”; Backloggd latest review / “Última review”; ACF “Esconder…” = hide when checked).
 
 **Depends on**: Phase C partials; ideally T044 for usernames/toggles (else temporary constants in env only—prefer T044 first).
 
 ### User Story 4: Live Now without risking the site (P2)
 
-**Independent Test**: quickstart P2-03, P2-04, P2-05.
+**Independent Test**: quickstart P2-03, P2-03b, P2-04, P2-05.
 
-- [ ] T050 [US4] Implement Last.fm fetcher (`user.getRecentTracks`, nowplaying-only, transient, short timeout) in `wp-content/themes/pedro-ribeiro/inc/now-lastfm.php`
-- [ ] T051 [P] [US4] Implement Backloggd playing-page fetcher (first current game, transient, short timeout, silent fail) in `wp-content/themes/pedro-ribeiro/inc/now-backloggd.php`
-- [ ] T052 [US4] Add aggregator returning normalized `{ listening, gaming }` (nulls on fail/empty) and load from `wp-content/themes/pedro-ribeiro/functions.php`
-- [ ] T053 [US4] Render `template-parts/now.php`: show only non-null parts; omit entire section if both null; no error/unavailable UI; title as live integrations
-- [ ] T054 [US4] Verify API key read from env/`wp-config` only; usernames/toggles from ACF config (post-T044)
+- [X] T050 [US4] Update Last.fm fetcher in `wp-content/themes/pedro-ribeiro/inc/now-lastfm.php`: `user.getRecentTracks`; prefer track with nowplaying; if none, fall back to most recent scrobble (one item); `null` only on fail/empty list; transient + short timeout (clarify 2026-08-13 — not nowplaying-only)
+- [X] T051 [P] [US4] Update Backloggd fetcher in `wp-content/themes/pedro-ribeiro/inc/now-backloggd.php`: scrape `/u/{username}/reviews/` (not `/playing/`); first `.review-card` → `title`, `image_url?`, `review`, `rating?` (from `.stars-top` width%), `url?`; transient + short timeout; silent fail → null
+- [X] T052 [US4] Add aggregator returning normalized `{ listening, gaming }` (nulls on fail/empty/hidden; `gaming` holds latest-review shape) and load from `wp-content/themes/pedro-ribeiro/functions.php`
+- [X] T053 [US4] Update `template-parts/now.php`: render Backloggd card with title, cover, truncated review (~100 chars + “…”), optional stars; label **"Última review"** (not “Jogando”); show only non-null parts; omit entire section if both null; no error UI
+- [X] T054 [US4] Verify API key read from env/`wp-config` only; usernames + hide toggles from ACF (`show_*` / “Esconder…” checked = hide; unchecked = expose)
+- [X] T055 [US4] Confirm listening UI label is always “Ouvindo” (nowplaying or last-scrobble) in `wp-content/themes/pedro-ribeiro/template-parts/now.php`; smoke P2-03b after T050 (clear Last.fm transient if needed)
 
-**Checkpoint**: US4 complete with silent degrade.
+**Checkpoint**: US4 complete with silent degrade + Last.fm idle fallback + Backloggd latest review. ✅ Phase E complete (Chat 4 + clarify 2026-08-13).
 
 ---
 
@@ -238,7 +239,7 @@ A (Setup)
 | US1 Hero/nav | P1 | T008–T010, T028 | B then C |
 | US2 Cases/timeline | P1 | T011–T012, T029 | B then C |
 | US3 Contato | P1 | T013, T030 | B then C |
-| US4 Now | P2 | T014, T031, T050–T054 | B mock → E live |
+| US4 Now | P2 | T014, T031, T050–T055 | B mock → E live |
 | US5 Escritos | P2 | T032–T034 | C |
 | US6 Admin CMS | P3 | T040–T045 | D |
 
@@ -247,7 +248,7 @@ A (Setup)
 - Phase A: T002, T003 in parallel after T001
 - Phase B: T011/T012 after shell; T015/T018/T019 in parallel near end
 - Phase C: T022/T023; T028/T029/T030; T033/T034 in parallel
-- Phase E: T050/T051 in parallel before T052
+- Phase E: T050/T051 in parallel before T052; T053 after T051 (review card UI); T055 after T050
 - Phase F: T061–T064 in parallel
 
 ### Parallel example: Phase B (Chat 1)
@@ -265,10 +266,10 @@ Task: "T013 [US3] Contato in frontend/index.html"
 ### Parallel example: Phase E (Chat 4)
 
 ```bash
-Task: "T050 [US4] now-lastfm.php"
-Task: "T051 [US4] now-backloggd.php"
+Task: "T050 [US4] now-lastfm.php (nowplaying → else last scrobble)"
+Task: "T051 [US4] now-backloggd.php (/reviews/ first review-card)"
 # Then serial:
-Task: "T052 aggregator → T053 now.php render → T054 secrets check"
+Task: "T052 aggregator → T053 now.php (Última review card) → T054 secrets/hide toggles → T055 Ouvindo label + P2-03b"
 ```
 
 ---
@@ -294,7 +295,7 @@ Task: "T052 aggregator → T053 now.php render → T054 secrets check"
 - Front-first: never start T021+ without T020
 - Do not invent ACF field keys; wiring only after T040 JSON
 - No contact form, no dark default, no headless, no WP core in Git
-- Now: one current item per source; silent omit
+- Now: one item per source (listening: nowplaying else last scrobble / “Ouvindo”; Backloggd: latest review / “Última review”); silent omit; “Esconder…” checked hides source
 
 ---
 

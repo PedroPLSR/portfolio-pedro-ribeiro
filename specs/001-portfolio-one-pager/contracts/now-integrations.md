@@ -2,11 +2,11 @@
 
 **Feature**: `001-portfolio-one-pager`  
 **Phase**: 2 (phase 1 may omit or mock without live calls)  
-**Date**: 2026-08-10
+**Date**: 2026-08-10 (updated 2026-08-13)
 
 ## Purpose
 
-Define how the theme obtains and exposes current listening and gaming activity for the home Now section.
+Define how the theme obtains and exposes live listening and the latest public Backloggd review for the home Now section.
 
 ## Shared rules
 
@@ -16,9 +16,9 @@ Define how the theme obtains and exposes current listening and gaming activity f
 | Cache | WordPress transients; suggested TTL 300s (tunable) |
 | Timeout | Short connect/response timeout (e.g. 3–5s); failure ≡ empty |
 | Secrets | `LASTFM_API_KEY` only in env / `wp-config`; never ACF/content |
-| Config | Usernames + visibility toggles via ACF/config after owner sync |
-| Output | At most one current item per source |
-| UI | No error strings; omit part or whole section |
+| Config | Usernames + hide toggles via ACF/config after owner sync (checked “Esconder…” = hide source; unchecked = expose) |
+| Output | At most one item per source |
+| UI | No error strings; omit part or whole section; listening label always "Ouvindo"; Backloggd label always "Última review" |
 
 ## Normalized internal shape
 
@@ -27,15 +27,22 @@ Theme helpers SHOULD return a common shape (names illustrative—not ACF keys):
 ```text
 NowResult {
   listening: null | { title, artist, url?, image_url? }
-  gaming:    null | { title, url? }
+  gaming:    null | { title, image_url?, review, rating?, url? }
 }
 ```
 
+Notes:
+
+- Key `gaming` is kept for continuity with ACF `show_gaming` / aggregator; the payload is a **latest review**, not a currently-playing game.
+- `review` = plain review body text (theme truncates to ~100 characters + “…” in UI).
+- `rating` = optional 0–5 (or equivalent) derived from `.stars-top` width percentage when present.
+- `url` = optional absolute URL to the review or game page.
+
 Render logic:
 
-1. If toggle off or username missing → that side `null`.
+1. If hide toggle checked or username missing → that side `null`.
 2. If fetch/parse fails → that side `null`.
-3. If source online but no *current* item → that side `null`.
+3. Listening: prefer nowplaying; else most recent scrobble; empty track list → `null`. Backloggd: no parseable first `.review-card` → `null`.
 4. If both `null` → do not render Now section markup.
 5. If one non-null → render only that block inside Now.
 
@@ -46,21 +53,25 @@ Render logic:
 | Endpoint | `https://ws.audioscrobbler.com/2.0/` |
 | Method | `user.getRecentTracks` |
 | Params | `user`, `api_key`, `format=json`, `limit=1` (or small limit) |
-| Current? | First track has nowplaying attr true |
+| Prefer | First track has nowplaying attr true |
+| Fallback | If no nowplaying, use the first recent track (last scrobble) |
 | Map | `name` → title; artist `#text` or `name` → artist; optional `url` / image |
-| Else | `listening = null` (do not fall back to last scrobble) |
+| Else | `listening = null` only on failure or empty track list |
+| Label | Always "Ouvindo" (no alternate for fallback) |
 
-## Backloggd — Jogando
+## Backloggd — Última review
 
 | Item | Contract |
 |------|----------|
-| Nature | Unofficial; public HTML of user’s playing list |
-| Fetch | `wp_remote_get` to the profile playing URL for configured username |
-| Current? | First game in the playing list |
-| Map | Game title + optional absolute game URL |
-| Else | `gaming = null` on empty list, HTTP error, or parse failure |
+| Nature | Unofficial; public HTML of user’s reviews list |
+| Fetch | `wp_remote_get` to `https://www.backloggd.com/u/{username}/reviews/` |
+| Select | First `.review-card` on the page |
+| Map | Game name → `title`; cover → `image_url?`; review body → `review`; `.stars-top` width% → `rating?`; optional absolute review/game link → `url?` |
+| Else | `gaming = null` on empty list, HTTP error, bot wall, or parse failure |
+| Label | Always "Última review" (MUST NOT use "Jogando") |
+| UI text | Truncate `review` to about 100 characters with an ellipsis |
 
-Parser selectors are implementation details; isolate in `inc/now-backloggd.php` so markup churn is localized.
+Parser selectors beyond `.review-card` / `.stars-top` are implementation details; isolate in `inc/now-backloggd.php` so markup churn is localized. Do **not** use `/playing/`.
 
 ## Transient keys (illustrative)
 

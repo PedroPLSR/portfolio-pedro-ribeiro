@@ -73,17 +73,28 @@ function pedro_ribeiro_get_lastfm_api_key() {
 }
 
 /**
- * Now layout labels/config from Home flex_content (owner JSON keys only).
- * Synced schema currently exposes now_tag + now_title — no usernames/toggles/secrets.
- * Live fetchers belong to Phase E.
+ * Now layout config from Home flex_content (owner JSON keys only).
+ * ACF keys: now_tag, now_title, show_listening, show_gaming, label_lastfm,
+ * label_backlogdd, lastfm_username, backloggd_username.
+ * LASTFM_API_KEY is never read from ACF (env / wp-config only).
+ *
+ * ACF fields are named show_* but admin labels are "Esconder…":
+ * checked (true) = hide that source; unchecked (default) = expose / fetch.
+ * Normalized here as hide_listening / hide_gaming.
  *
  * @param int|null $post_id Home page ID; defaults to page_on_front.
- * @return array{tag: string, title: string}
+ * @return array{tag: string, title: string, hide_listening: bool, hide_gaming: bool, label_listening: string, label_review: string, lastfm_username: string, backloggd_username: string}
  */
 function pedro_ribeiro_get_now_config( $post_id = null ) {
 	$config = array(
-		'tag'   => '',
-		'title' => '',
+		'tag'                => '',
+		'title'              => '',
+		'hide_listening'     => false,
+		'hide_gaming'        => false,
+		'label_listening'    => '',
+		'label_review'       => '',
+		'lastfm_username'    => '',
+		'backloggd_username' => '',
 	);
 
 	if ( ! function_exists( 'get_field' ) ) {
@@ -97,9 +108,18 @@ function pedro_ribeiro_get_now_config( $post_id = null ) {
 
 	// Prefer current flexible row when already inside a `now` layout.
 	if ( function_exists( 'get_row_layout' ) && get_row_layout() === 'now' ) {
-		$config['tag']   = (string) ( get_sub_field( 'now_tag' ) ?: '' );
-		$config['title'] = (string) ( get_sub_field( 'now_title' ) ?: '' );
-		return $config;
+		return pedro_ribeiro_normalize_now_config(
+			array(
+				'now_tag'            => get_sub_field( 'now_tag' ),
+				'now_title'          => get_sub_field( 'now_title' ),
+				'show_listening'     => get_sub_field( 'show_listening' ),
+				'show_gaming'        => get_sub_field( 'show_gaming' ),
+				'label_lastfm'       => get_sub_field( 'label_lastfm' ),
+				'label_backlogdd'    => get_sub_field( 'label_backlogdd' ),
+				'lastfm_username'    => get_sub_field( 'lastfm_username' ),
+				'backloggd_username' => get_sub_field( 'backloggd_username' ),
+			)
+		);
 	}
 
 	$rows = get_field( 'flex_content', $post_id );
@@ -111,10 +131,28 @@ function pedro_ribeiro_get_now_config( $post_id = null ) {
 		if ( ( $row['acf_fc_layout'] ?? '' ) !== 'now' ) {
 			continue;
 		}
-		$config['tag']   = (string) ( $row['now_tag'] ?? '' );
-		$config['title'] = (string) ( $row['now_title'] ?? '' );
-		break;
+		return pedro_ribeiro_normalize_now_config( $row );
 	}
 
 	return $config;
+}
+
+/**
+ * Normalize a flex `now` row into the theme Now config shape.
+ *
+ * @param array $row ACF row or sub-field map.
+ * @return array{tag: string, title: string, hide_listening: bool, hide_gaming: bool, label_listening: string, label_review: string, lastfm_username: string, backloggd_username: string}
+ */
+function pedro_ribeiro_normalize_now_config( array $row ) {
+	return array(
+		'tag'                => (string) ( $row['now_tag'] ?? '' ),
+		'title'              => (string) ( $row['now_title'] ?? '' ),
+		// ACF key show_* + label "Esconder" → checked means hide.
+		'hide_listening'     => (bool) ( $row['show_listening'] ?? false ),
+		'hide_gaming'        => (bool) ( $row['show_gaming'] ?? false ),
+		'label_listening'    => trim( (string) ( $row['label_lastfm'] ?? '' ) ),
+		'label_review'       => trim( (string) ( $row['label_backlogdd'] ?? '' ) ),
+		'lastfm_username'    => trim( (string) ( $row['lastfm_username'] ?? '' ) ),
+		'backloggd_username' => trim( (string) ( $row['backloggd_username'] ?? '' ) ),
+	);
 }
